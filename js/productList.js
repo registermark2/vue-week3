@@ -133,7 +133,6 @@ app.component('productModal',{
         })
     },
   },
-
 })
 
 
