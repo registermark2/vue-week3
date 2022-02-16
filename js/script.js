@@ -26,7 +26,7 @@ function login() {
       // console.log(res);
       const { token, expired } = res.data;
       document.cookie = `tatw=${token}; expired=${new Date(expired)}; `;
-      window.location = "/productList.html";
+      window.location = "./productList.html";
     })
     .catch((error) => {
       // console.dir(error);

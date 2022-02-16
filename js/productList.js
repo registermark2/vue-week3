@@ -1,7 +1,10 @@
-let productModel = {};
+import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js';
+
+
+let productModal = {};
 let delProductModel ={};
 
-const app = {
+const app = createApp({
   //關注點分離
   data() {
     //function return
@@ -40,37 +43,38 @@ const app = {
           alert(error);
         })
     },
-    openModel(status,item){
+    openModal(status,item){
       if(status==='open'){
+        console.log('open');
         this.tempProduct={
           imgsUrlArr:[],
         };//清空暫存
         this.isNew=true;
-        productModel.show();
+        productModal.show();
       }else if (status==='close'){
-        productModel.hide();
+        productModal.hide();
       }else if (status==='edit'){
         this.tempProduct={...item};
         this.isNew=false;
-        productModel.show();
+        productModal.show();
       }else if (status==='delete'){
         this.tempProduct = {...item}
         delProductModel.show();
       }
     },
-    updateProduct(){
-      let method='post';
-      let url = `${this.url}/api/${this.path}/admin/product`;
-      if(this.isNew==false){
-        url=`${this.url}/api/${this.path}/admin/product/${this.tempProduct.id}`;
-        method='put';
-      }
-      axios[method](url, {data:this.tempProduct})
-        .then((res)=>{
-          this.openModel('close');
-          this.getProductList();
-        })
-    },
+    // updateProduct(){
+    //   let method='post';
+    //   let url = `${this.url}/api/${this.path}/admin/product`;
+    //   if(this.isNew==false){
+    //     url=`${this.url}/api/${this.path}/admin/product/${this.tempProduct.id}`;
+    //     method='put';
+    //   }
+    //   axios[method](url, {data:this.tempProduct})
+    //     .then((res)=>{
+    //       this.openModel('close');
+    //       this.getProductList();
+    //     })
+    // },
     deleteProduct(){
       const url = `${this.url}/api/${this.path}/admin/product/${this.tempProduct.id}`
       axios.delete(url, {data:this.tempProduct})
@@ -91,11 +95,47 @@ const app = {
     this.checkLogin();
   },
   mounted() {
-    const model = document.querySelector('#productModal');
-    productModel = new bootstrap.Modal(model);
-    const delmodel = document.querySelector('#delProductModal');
-    delProductModel = new bootstrap.Modal(delmodel);
+    // const model = document.querySelector('#productModal');
+    // productModel = new bootstrap.Modal(model);
+    // const delmodel = document.querySelector('#delProductModal');
+    // delProductModel = new bootstrap.Modal(delmodel);
     this.getProductList();
   }
-}
-Vue.createApp(app).mount('#app');
+});
+
+
+// 新增產品編輯元件
+app.component('productModal',{
+  template:'#productModal',
+  props:['product','isNew'],
+  data(){
+    return {
+      url: 'https://vue3-course-api.hexschool.io/v2',
+      path:'tatw',
+    }
+  },
+  mounted(){
+    const modal = document.querySelector('#productModal');
+    productModal = new bootstrap.Modal(modal);
+  },
+  methods:{
+    updateProduct(){
+      let method='post';
+      let url = `${this.url}/api/${this.path}/admin/product`;
+      if(this.isNew==false){
+        url=`${this.url}/api/${this.path}/admin/product/${this.product.id}`;
+        method='put';
+      }
+      axios[method](url, {data:this.product})
+        .then((res)=>{
+          productModal.hide();
+          this.$emit('update');
+        })
+    },
+  },
+
+})
+
+
+
+app.mount('#app');
